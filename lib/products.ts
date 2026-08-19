@@ -69,7 +69,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 190,
-    image: "/led/indoor-3.jpg",
+    image: "/led/leyard-tvf-p18.png",
     description:
       "Fine-pitch Leyard TVF для ритейла и медиастен. Шаг 1,8 мм, фронтальный сервис, кабинет 27″ класса.",
   },
@@ -109,7 +109,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 230,
-    image: "/led/indoor-5.jpg",
+    image: "/led/absen-pl25-plus.png",
     description:
       "Серия Absen PL Plus V2: 500×500 мм, 200×200 пикселей, 1200 нит, refresh 7680 Гц — как в спецификации 2024.",
   },
@@ -169,7 +169,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 215,
-    image: "/led/outdoor-3.jpg",
+    image: "/led/unilumin-usurface-p5.png",
     description:
       "Usurface для трасс и площадей. Дальняя дистанция, высокий запас яркости, полный outdoor IP65.",
   },
@@ -189,7 +189,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 185,
-    image: "/led/outdoor-4.jpg",
+    image: "/led/absen-a-series-p66.png",
     description:
       "Absen A Series P6.66 из спецификации 2024: 1280×960 мм, 7500 нит, SMD 2727 — крупные медиафасады.",
   },
@@ -209,7 +209,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 175,
-    image: "/led/outdoor-5.jpg",
+    image: "/led/absen-a-series-p10.png",
     description:
       "Билборд Absen A Series P10: 1280×960 мм, 128×96 пикселей, 7500 нит — экономичный outdoor на дальнюю дистанцию.",
   },
@@ -269,7 +269,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "cabinet",
     hue: 280,
-    image: "/led/rental-2.jpg",
+    image: "/led/absen-pl39-pro.png",
     description:
       "Прокатный Absen PL Pro V2. 500×500 мм, высокая яркость и защита — фестивали и уличные ивенты.",
   },
@@ -289,7 +289,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 320,
-    image: "/led/flexible-1.jpg",
+    image: "/led/unilumin-flexible-p2.png",
     description:
       "Гибкий модуль Unilumin для колонн и арок. Гнётся без видимой сетки — брендовые зоны и шоурумы.",
   },
@@ -309,7 +309,7 @@ export const PRODUCTS: Product[] = [
     hit: false,
     unit: "m2",
     hue: 330,
-    image: "/led/flexible-2.jpg",
+    image: "/led/absen-flexible-p25.png",
     description:
       "Мягкий Absen P2.5 для волн и радиусов. Под заказ 7–14 дней, монтаж по Таджикистану.",
   },

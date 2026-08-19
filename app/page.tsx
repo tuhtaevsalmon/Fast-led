@@ -77,11 +77,16 @@ export default function Home() {
       </section>
 
       <section id="catalog" className="page-shell scroll-mt-20 pt-12 pb-12 sm:pt-16 sm:pb-16 lg:pt-20 lg:pb-20">
-        <div className="mb-6 flex items-end justify-between sm:mb-8">
+        <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">Модели</h2>
-          <Link href="/catalog" className="sr-only">
-            Весь каталог
-          </Link>
+          <Button
+            variant="outline"
+            className="h-10 shrink-0 px-4 sm:h-9"
+            nativeButton={false}
+            render={<Link href="/catalog" />}
+          >
+            Смотреть весь каталог
+          </Button>
         </div>
         <ProductCarousel />
       </section>

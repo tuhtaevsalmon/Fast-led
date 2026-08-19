@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { sliderRange } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { formatMoney } from "@/lib/format"
+import { SlidersHorizontal } from "lucide-react"
 
 function ruModels(n: number) {
   const n10 = n % 10
@@ -65,6 +66,7 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
   const [pitches, setPitches] = useState<PixelPitch[]>([])
   const [brightness, setBrightness] = useState<[number, number]>([nits.min, nits.max])
   const [price, setPrice] = useState<[number, number]>([bounds.min, bounds.max])
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   const pricePresets: Array<{ label: string; range: [number, number] }> = [
     { label: "Любая", range: [bounds.min, bounds.max] },
@@ -114,7 +116,29 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
 
   return (
     <div>
-      <div className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          Найдено{" "}
+          <span className="font-medium text-foreground">{list.length}</span>{" "}
+          {ruModels(list.length)}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-10 px-4 sm:h-9"
+          aria-expanded={filtersOpen}
+          onClick={() => setFiltersOpen((open) => !open)}
+        >
+          <SlidersHorizontal className="size-3.5" />
+          Фильтры
+          {dirty ? (
+            <span className="size-1.5 rounded-full bg-primary" aria-hidden />
+          ) : null}
+        </Button>
+      </div>
+
+      {filtersOpen ? (
+      <div className="mb-8 rounded-2xl border bg-card p-4 shadow-sm sm:p-5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="text-sm font-semibold">Фильтры</p>
           {dirty ? (
@@ -205,14 +229,8 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
           </div>
         </div>
       </div>
+      ) : null}
 
-      <div className="mt-6 mb-5 flex items-baseline justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          Найдено{" "}
-          <span className="font-medium text-foreground">{list.length}</span>{" "}
-          {ruModels(list.length)}
-        </p>
-      </div>
       <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-7 xl:grid-cols-4">
         {list.map((p) => (
           <ProductCard key={p.id} product={p} />
