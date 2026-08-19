@@ -7,6 +7,8 @@ export function adminPassword() {
   return process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "fastled")
 }
 
+let tokenCache: string | null = null
+
 async function sign(value: string) {
   const secret = process.env.ADMIN_SECRET || adminPassword() || "fastled-dev"
   const key = await crypto.subtle.importKey(
@@ -23,7 +25,8 @@ async function sign(value: string) {
 }
 
 export async function sessionToken() {
-  return sign("ok")
+  if (!tokenCache) tokenCache = await sign("ok")
+  return tokenCache
 }
 
 export async function isAdminCookie(value?: string) {

@@ -8,9 +8,9 @@ const LOCAL_FILE = path.join(process.cwd(), "data", "site.json")
 const BLOB_KEY = "cms/site.json"
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  phone: "+992 900 00 00 00",
-  phoneTel: "+992900000000",
-  whatsapp: "992900000000",
+  phone: "+992 98 713 99 56",
+  phoneTel: "+992987139956",
+  whatsapp: "992987139956",
   instagram: "fastled.tj",
   address: "пр. Рудаки 36, Душанбе",
   email: "hello@fastled.tj",
@@ -33,11 +33,20 @@ function seed(): SiteContent {
   }
 }
 
+const PLACEHOLDER_PHONE = "992900000000"
+
 function normalize(raw: Partial<SiteContent> | null): SiteContent {
   const base = seed()
   if (!raw) return base
+  const settings = { ...base.settings, ...raw.settings }
+  const digits = String(settings.phone || "").replace(/\D/g, "")
+  if (!digits || digits === PLACEHOLDER_PHONE) {
+    settings.phone = base.settings.phone
+    settings.phoneTel = base.settings.phoneTel
+    settings.whatsapp = base.settings.whatsapp
+  }
   return {
-    settings: { ...base.settings, ...raw.settings },
+    settings,
     products: (raw.products ?? base.products).map((p) => ({
       ...p,
       hidden: Boolean(p.hidden),
@@ -49,16 +58,33 @@ function normalize(raw: Partial<SiteContent> | null): SiteContent {
   }
 }
 
+function useRemoteBlob() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN && process.env.VERCEL)
+}
+
+async function parseBlobJson(text: string) {
+  return normalize(JSON.parse(text))
+}
+
 async function readBlob(): Promise<SiteContent | null> {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return null
+  if (!useRemoteBlob()) return null
+  try {
+    const { get } = await import("@vercel/blob")
+    const result = await get(BLOB_KEY, { access: "public", useCache: true })
+    if (result?.statusCode === 200 && result.stream) {
+      return parseBlobJson(await new Response(result.stream).text())
+    }
+  } catch {
+    /* try list fallback */
+  }
   try {
     const { list } = await import("@vercel/blob")
-    const { blobs } = await list({ prefix: BLOB_KEY })
+    const { blobs } = await list({ prefix: BLOB_KEY, limit: 5 })
     const file = blobs.find((b) => b.pathname === BLOB_KEY) ?? blobs[0]
     if (!file) return null
-    const res = await fetch(file.url, { cache: "no-store" })
+    const res = await fetch(file.url, { next: { revalidate: 30 } })
     if (!res.ok) return null
-    return normalize(await res.json())
+    return parseBlobJson(await res.text())
   } catch {
     return null
   }
@@ -81,9 +107,13 @@ async function writeBlob(content: SiteContent) {
   }
 }
 
-export async function readSite(): Promise<SiteContent> {
+let mem: SiteContent | null = null
+let inflight: Promise<SiteContent> | null = null
+
+async function loadSite(): Promise<SiteContent> {
   const fromBlob = await readBlob()
   if (fromBlob) return fromBlob
+  if (useRemoteBlob()) return seed()
   try {
     const text = await readFile(LOCAL_FILE, "utf8")
     return normalize(JSON.parse(text))
@@ -92,18 +122,36 @@ export async function readSite(): Promise<SiteContent> {
   }
 }
 
+export async function readSite(): Promise<SiteContent> {
+  if (mem) return mem
+  if (!inflight) {
+    inflight = loadSite()
+      .then((data) => {
+        mem = data
+        return data
+      })
+      .finally(() => {
+        inflight = null
+      })
+  }
+  return inflight
+}
+
 export async function writeSite(content: SiteContent) {
   const next = normalize(content)
-  const blobOk = await writeBlob(next)
+  mem = next
+  if (useRemoteBlob()) {
+    const blobOk = await writeBlob(next)
+    if (!blobOk) {
+      throw new Error("Не удалось сохранить. На Vercel проверьте BLOB_READ_WRITE_TOKEN.")
+    }
+    return next
+  }
   try {
     await mkdir(path.dirname(LOCAL_FILE), { recursive: true })
     await writeFile(LOCAL_FILE, JSON.stringify(next, null, 2), "utf8")
   } catch {
-    if (!blobOk) {
-      throw new Error(
-        "Не удалось сохранить. Локально проверьте папку data/. На Vercel добавьте BLOB_READ_WRITE_TOKEN."
-      )
-    }
+    throw new Error("Не удалось сохранить. Локально проверьте папку data/.")
   }
   return next
 }
@@ -135,7 +183,7 @@ export async function saveUploadedFile(file: File, folder: string) {
   const name = `${folder}-${Date.now()}.${safeExt}`
   const bytes = Buffer.from(await file.arrayBuffer())
 
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  if (useRemoteBlob() || process.env.CMS_USE_BLOB === "1") {
     const { put } = await import("@vercel/blob")
     const uploaded = await put(`cms/uploads/${name}`, bytes, {
       access: "public",

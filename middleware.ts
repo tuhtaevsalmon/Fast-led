@@ -3,7 +3,10 @@ import type { NextRequest } from "next/server"
 
 const COOKIE = "fl_admin"
 
+let expectedToken: string | null = null
+
 async function tokenFromEnv() {
+  if (expectedToken) return expectedToken
   const password = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "fastled")
   const secret = process.env.ADMIN_SECRET || password || "fastled-dev"
   const key = await crypto.subtle.importKey(
@@ -14,9 +17,10 @@ async function tokenFromEnv() {
     ["sign"]
   )
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode("ok"))
-  return Array.from(new Uint8Array(sig))
+  expectedToken = Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
+  return expectedToken
 }
 
 export async function middleware(request: NextRequest) {

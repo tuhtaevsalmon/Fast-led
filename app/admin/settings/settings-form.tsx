@@ -47,7 +47,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           name="phone"
           value={phone}
           onChange={(e) => setPhone(formatTjPhone(e.target.value))}
-          placeholder="+992 90 000 00 00"
+          placeholder="+992 98 713 99 56"
         />
         <p className="text-xs text-muted-foreground">
           Один номер для звонка, WhatsApp, шапки, подвала и контактов.
