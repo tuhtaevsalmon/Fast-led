@@ -1,8 +1,9 @@
 "use client"
 
-import { PRODUCTS } from "@/lib/products"
+import type { Product, SiteSettings } from "@/lib/types"
 import { useCart } from "@/store/cart-store"
 import { OrderForm } from "@/components/order-form"
+import { formatMoney } from "@/lib/format"
 import {
   Dialog,
   DialogContent,
@@ -12,12 +13,18 @@ import {
 } from "@/components/ui/dialog"
 import { useState } from "react"
 
-export function QuoteDialog() {
+export function QuoteDialog({
+  products,
+  settings,
+}: {
+  products: Product[]
+  settings: SiteSettings
+}) {
   const quoteOpen = useCart((s) => s.quoteOpen)
   const quoteProductId = useCart((s) => s.quoteProductId)
   const setQuoteOpen = useCart((s) => s.setQuoteOpen)
   const [sent, setSent] = useState(false)
-  const product = PRODUCTS.find((p) => p.id === quoteProductId)
+  const product = products.find((p) => p.id === quoteProductId)
 
   return (
     <Dialog
@@ -40,7 +47,11 @@ export function QuoteDialog() {
           <p className="p-2 text-sm text-muted-foreground">Заявка принята. Свяжемся выбранным способом.</p>
         ) : (
           <OrderForm
+            settings={settings}
             submitLabel="Отправить заявку на КП"
+            extraText={() =>
+              product ? `Модель: ${product.name}\n${formatMoney(product.pricePerM2Tjs)} / ${product.unit === "cabinet" ? "кабинет" : "м²"}` : ""
+            }
             onSubmit={() => setSent(true)}
           />
         )}

@@ -1,6 +1,10 @@
 import { Mail, MapPin, Phone } from "lucide-react"
+import { getSettings } from "@/lib/content/store"
 
-export default function ContactsPage() {
+export const dynamic = "force-dynamic"
+
+export default async function ContactsPage() {
+  const settings = await getSettings()
   return (
     <div className="page-shell py-8 sm:py-12 lg:py-16">
       <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Контакты</h1>
@@ -10,15 +14,15 @@ export default function ContactsPage() {
       <div className="mt-10 space-y-4 text-sm text-muted-foreground">
         <p className="flex gap-3">
           <MapPin className="size-4" />
-          пр. Рудаки 36, Душанбе
+          {settings.address}
         </p>
         <p className="flex gap-3">
           <Phone className="size-4" />
-          +992 900 00 00 00
+          {settings.phone}
         </p>
         <p className="flex gap-3">
           <Mail className="size-4" />
-          hello@fastled.tj
+          {settings.email}
         </p>
       </div>
       <div className="mt-10 max-w-3xl overflow-hidden rounded-2xl ring-1 ring-black/5">

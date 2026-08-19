@@ -6,44 +6,46 @@ import { cartCount, cartTotal, useCart } from "@/store/cart-store"
 import { OrderForm } from "@/components/order-form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import type { SiteSettings } from "@/lib/types"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useState } from "react"
 
-export function CartSheet() {
-  const { items, cartOpen, setCartOpen, setQty, removeItem, clear } =
-    useCart()
+export function CartSheet({ settings }: { settings: SiteSettings }) {
+  const { items, cartOpen, setCartOpen, setQty, removeItem, clear } = useCart()
   const [sent, setSent] = useState(false)
   const total = cartTotal(items)
+  const count = cartCount(items)
 
   return (
-    <Sheet
+    <Dialog
       open={cartOpen}
       onOpenChange={(open) => {
         setCartOpen(open)
         if (!open) setSent(false)
       }}
     >
-      <SheetContent className="w-full max-w-none pb-[env(safe-area-inset-bottom)] sm:max-w-md lg:max-w-lg" side="right">
-        <SheetHeader className="border-b">
-          <SheetTitle className="text-lg font-semibold">Корзина</SheetTitle>
-          <SheetDescription>
-            {cartCount(items) === 0
-              ? "Пока пусто."
-              : `${cartCount(items)} · ${formatMoney(total)}`}
-          </SheetDescription>
-        </SheetHeader>
+      <DialogContent
+        className="flex max-h-[min(90vh,40rem)] w-full max-w-lg flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
+        showCloseButton
+      >
+        <DialogHeader className="border-b px-5 py-4">
+          <DialogTitle className="text-lg font-semibold">Корзина</DialogTitle>
+          <DialogDescription>
+            {count === 0 ? "Пока пусто." : `${count} · ${formatMoney(total)}`}
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
           {sent ? (
             <p className="py-8 text-sm leading-7 text-muted-foreground">
-              Заявка отправлена. Менеджер свяжется в рабочее время.
+              Заявка отправлена. Менеджер свяжется в WhatsApp.
             </p>
           ) : items.length === 0 ? (
             <p className="py-10 text-center text-sm text-muted-foreground">
@@ -51,7 +53,7 @@ export function CartSheet() {
             </p>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="border-b pb-4">
+              <div key={item.id} className="border-b pb-4 last:border-b-0">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm">{item.name}</p>
@@ -84,9 +86,7 @@ export function CartSheet() {
                       <Plus className="size-3" />
                     </Button>
                   </div>
-                  <p className="text-sm">
-                    {formatMoney(item.qty * item.pricePerUnitTjs)}
-                  </p>
+                  <p className="text-sm">{formatMoney(item.qty * item.pricePerUnitTjs)}</p>
                 </div>
               </div>
             ))
@@ -102,6 +102,14 @@ export function CartSheet() {
                 </span>
               </div>
               <OrderForm
+                settings={settings}
+                extraText={() => {
+                  const lines = items.map(
+                    (item) =>
+                      `${item.name} × ${item.qty} ${item.unitLabel} — ${formatMoney(item.qty * item.pricePerUnitTjs)}`
+                  )
+                  return ["Заказ:", ...lines, "", `Итого: ${formatMoney(total)}`].join("\n")
+                }}
                 onSubmit={() => {
                   setSent(true)
                   clear()
@@ -111,12 +119,12 @@ export function CartSheet() {
           ) : null}
         </div>
 
-        <SheetFooter>
+        <DialogFooter className="mx-0 mb-0">
           <Button variant="ghost" onClick={() => setCartOpen(false)}>
             Закрыть
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

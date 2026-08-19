@@ -1,6 +1,8 @@
 import { MapPin, Phone } from "lucide-react"
-import { ContactForm } from "@/app/contacts/form"
+import { ContactForm } from "@/app/(shop)/contacts/form"
 import { Logo } from "@/components/logo"
+import type { SiteSettings } from "@/lib/types"
+import { instagramLabel, instagramUrl } from "@/lib/content/urls"
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -10,7 +12,7 @@ function InstagramIcon({ className }: { className?: string }) {
   )
 }
 
-export function Footer() {
+export function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer id="lead" className="mt-auto scroll-mt-20 border-t bg-white dark:bg-background">
       <div className="page-shell grid gap-10 py-8 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:py-10">
@@ -20,20 +22,20 @@ export function Footer() {
             <span className="hidden h-4 w-px bg-black/10 sm:block dark:bg-white/15" />
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="size-3.5 shrink-0" />
-              пр. Рудаки 36
+              {settings.address}
             </p>
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Phone className="size-3.5 shrink-0" />
-              +992 900 00 00 00
+              {settings.phone}
             </p>
             <a
-              href="https://www.instagram.com/fastled.tj"
+              href={instagramUrl(settings)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm leading-none text-muted-foreground hover:text-foreground"
             >
               <InstagramIcon className="block size-3.5 shrink-0" />
-              <span>fastled.tj</span>
+              <span>{instagramLabel(settings)}</span>
             </a>
           </div>
           <p className="text-sm leading-6 text-muted-foreground">
@@ -49,12 +51,14 @@ export function Footer() {
             />
           </div>
         </div>
-        <div className="flex h-full flex-col">
+        <div className="flex h-full min-h-0 flex-col">
           <h2 className="text-lg font-semibold tracking-tight">Заявка</h2>
           <p className="mt-1 mb-4 text-xs text-muted-foreground">
-            Имя, телефон +992, город и монтаж.
+            Имя, город и монтаж.
           </p>
-          <ContactForm compact />
+          <div className="flex min-h-0 flex-1 flex-col">
+            <ContactForm compact alignBottom settings={settings} />
+          </div>
         </div>
       </div>
       <div className="border-t py-3 text-center text-xs text-muted-foreground">

@@ -26,7 +26,7 @@ export type Product = {
   slug: string
   name: string
   category: LedCategory
-  pitch: PixelPitch
+  pitch: number
   brightness: number
   ipRating: "IP31" | "IP54" | "IP65" | "IP67"
   cabinetMm: [number, number]
@@ -35,10 +35,37 @@ export type Product = {
   pricePerM2Tjs: number
   inStock: boolean
   hit: boolean
+  hidden: boolean
   unit: "m2" | "cabinet"
   description: string
   hue: number
   image: string
+}
+
+export type Project = {
+  id: string
+  title: string
+  city: string
+  area: number
+  pitch?: number
+  place: string
+  image: string
+  showOnHome: boolean
+}
+
+export type SiteSettings = {
+  phone: string
+  phoneTel: string
+  whatsapp: string
+  instagram: string
+  address: string
+  email: string
+}
+
+export type SiteContent = {
+  settings: SiteSettings
+  products: Product[]
+  projects: Project[]
 }
 
 export type CartItem = {

@@ -28,6 +28,11 @@ export function LedPreview({
   sizes?: string
   unoptimized?: boolean
 }) {
+  if (!src) {
+    return (
+      <div className={cn("media-frame bg-muted", className)} aria-hidden />
+    )
+  }
   return (
     <div className={cn("media-frame relative overflow-hidden", className)}>
       <div
@@ -44,7 +49,7 @@ export function LedPreview({
             priority={priority}
             quality={quality}
             sizes={sizes}
-            unoptimized={unoptimized}
+            unoptimized={unoptimized || src.startsWith("http")}
             className={cn(
               fit === "contain" ? "object-contain" : "object-cover",
               fit === "cover" &&

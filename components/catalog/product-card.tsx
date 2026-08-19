@@ -19,6 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
           className="aspect-[4/3]"
           fit="contain"
           quality={95}
+          unoptimized
           label={product.inStock ? "В наличии" : "Под заказ"}
         />
       </Link>

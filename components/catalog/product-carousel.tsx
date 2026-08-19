@@ -2,13 +2,13 @@
 
 import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PRODUCTS } from "@/lib/products"
 import { ProductCard } from "@/components/catalog/product-card"
+import type { Product } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-export function ProductCarousel() {
+export function ProductCarousel({ products }: { products: Product[] }) {
   const scroller = useRef<HTMLDivElement>(null)
-  const items = PRODUCTS.filter((p) => p.hit)
+  const items = products.filter((p) => p.hit)
 
   const move = (dir: -1 | 1) => {
     const el = scroller.current

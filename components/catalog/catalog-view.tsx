@@ -3,12 +3,10 @@
 import { useMemo, useState, type ReactNode } from "react"
 import {
   CATEGORY_LABEL,
-  PITCH_OPTIONS,
-  PRODUCTS,
   brightnessBounds,
   priceBounds,
 } from "@/lib/products"
-import type { LedCategory, PixelPitch } from "@/lib/types"
+import type { LedCategory, Product } from "@/lib/types"
 import { ProductCard } from "@/components/catalog/product-card"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
@@ -59,11 +57,18 @@ function Chip({
   )
 }
 
-export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }) {
-  const bounds = priceBounds()
-  const nits = brightnessBounds()
+export function CatalogView({
+  products,
+  featuredOnly = false,
+}: {
+  products: Product[]
+  featuredOnly?: boolean
+}) {
+  const bounds = priceBounds(products)
+  const nits = brightnessBounds(products)
+  const pitchOptions = [...new Set(products.map((p) => p.pitch))].sort((a, b) => a - b)
   const [category, setCategory] = useState<LedCategory | "all">("all")
-  const [pitches, setPitches] = useState<PixelPitch[]>([])
+  const [pitches, setPitches] = useState<number[]>([])
   const [brightness, setBrightness] = useState<[number, number]>([nits.min, nits.max])
   const [price, setPrice] = useState<[number, number]>([bounds.min, bounds.max])
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -76,7 +81,7 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
   ]
 
   const list = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return products.filter((p) => {
       if (featuredOnly && !p.hit) return false
       if (category !== "all" && p.category !== category) return false
       if (pitches.length && !pitches.includes(p.pitch)) return false
@@ -84,7 +89,7 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
       if (p.pricePerM2Tjs < price[0] || p.pricePerM2Tjs > price[1]) return false
       return true
     })
-  }, [category, pitches, brightness, price, featuredOnly])
+  }, [category, pitches, brightness, price, featuredOnly, products])
 
   const dirty =
     category !== "all" ||
@@ -167,7 +172,7 @@ export function CatalogView({ featuredOnly = false }: { featuredOnly?: boolean }
           <div>
             <p className="mb-2 text-xs font-medium text-muted-foreground">Шаг пикселя</p>
             <div className="flex flex-wrap gap-2">
-              {PITCH_OPTIONS.map((p) => (
+              {pitchOptions.map((p) => (
                 <Chip
                   key={p}
                   active={pitches.includes(p)}

@@ -1,12 +1,15 @@
 import Link from "next/link"
 import { ProductCarousel } from "@/components/catalog/product-carousel"
 import { LedPreview } from "@/components/led-preview"
-import { PROJECTS } from "@/lib/portfolio"
 import { Button } from "@/components/ui/button"
+import { getHomeProjects, getPublicProducts } from "@/lib/content/store"
 
 const BRANDS = ["Absen", "Unilumin", "Leyard", "NovaStar"]
 
-export default function Home() {
+export const dynamic = "force-dynamic"
+
+export default async function Home() {
+  const [products, projects] = await Promise.all([getPublicProducts(), getHomeProjects()])
   return (
     <div>
       <section className="page-shell grid items-start gap-8 pt-10 pb-8 sm:pt-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-12 lg:pt-16 lg:pb-12 xl:gap-16 xl:pt-20">
@@ -88,7 +91,7 @@ export default function Home() {
             Смотреть весь каталог
           </Button>
         </div>
-        <ProductCarousel />
+        <ProductCarousel products={products} />
       </section>
 
       <section id="projects" className="page-shell scroll-mt-20 pb-12 sm:pb-16 lg:pb-20">
@@ -96,7 +99,7 @@ export default function Home() {
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl lg:text-4xl">Проекты</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {PROJECTS.slice(0, 3).map((p) => (
+          {projects.map((p) => (
             <article key={p.id}>
               <LedPreview src={p.image} alt={p.title} className="aspect-[16/10] lg:aspect-[4/3]" />
               <p className="mt-3 text-sm font-medium">{p.title}</p>

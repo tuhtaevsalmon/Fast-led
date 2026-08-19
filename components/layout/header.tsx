@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
+import type { SiteSettings } from "@/lib/types"
+import { telHref, whatsappUrl } from "@/lib/content/urls"
 
 const NAV = [
   { href: "/", label: "Главная" },
@@ -44,16 +46,11 @@ function sectionFromScroll() {
 
 function navActive(pathname: string, href: string, section: string) {
   if (href === "/#catalog" && pathname.startsWith("/catalog")) return true
-  if (href === "/#projects" && pathname.startsWith("/portfolio")) return true
   if (href === "/#lead" && pathname.startsWith("/contacts")) return true
   if (pathname !== "/") return false
   if (href === "/") return section === ""
   return href === `/${section}`
 }
-
-const PHONE = "+992 900 00 00 00"
-const TEL = "tel:+992900000000"
-const WHATSAPP = "https://wa.me/992900000000"
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -63,7 +60,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
   )
 }
 
-export function Header() {
+export function Header({ settings }: { settings: SiteSettings }) {
   const pathname = usePathname()
   const items = useCart((s) => s.items)
   const setCartOpen = useCart((s) => s.setCartOpen)
@@ -127,18 +124,18 @@ export function Header() {
 
         <div className="flex items-center justify-self-end gap-0.5 sm:gap-1">
           <a
-            href={TEL}
+            href={telHref(settings)}
             className="hidden items-center gap-1.5 rounded-full px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground xl:flex"
           >
             <Phone className="size-3.5" />
-            {PHONE}
+            {settings.phone}
           </a>
           <Button
             variant="ghost"
             size="icon"
             className="rounded-full text-[#25D366]"
             nativeButton={false}
-            render={<a href={WHATSAPP} target="_blank" rel="noopener noreferrer" />}
+            render={<a href={whatsappUrl(settings)} target="_blank" rel="noopener noreferrer" />}
             aria-label="WhatsApp"
           >
             <WhatsAppIcon className="size-4" />
@@ -153,7 +150,9 @@ export function Header() {
           >
             <ShoppingBag className="size-4" />
             {count > 0 ? (
-              <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-primary" />
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {count > 9 ? "9+" : count}
+              </span>
             ) : null}
           </Button>
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -184,12 +183,12 @@ export function Header() {
                     </Link>
                   )
                 })}
-                <a href={TEL} className="mt-3 flex items-center gap-2 px-3 py-2 text-sm">
+                <a href={telHref(settings)} className="mt-3 flex items-center gap-2 px-3 py-2 text-sm">
                   <Phone className="size-4" />
-                  {PHONE}
+                  {settings.phone}
                 </a>
                 <a
-                  href={WHATSAPP}
+                  href={whatsappUrl(settings)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 text-sm text-[#25D366]"

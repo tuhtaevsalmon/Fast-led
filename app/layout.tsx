@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
-import { SiteShell } from "@/components/layout/site-shell"
 import { Providers } from "@/components/providers"
 import "./globals.css"
 
@@ -40,9 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${geistMono.variable} h-full`}
     >
       <body className="flex min-h-full flex-col overflow-x-hidden bg-background">
-        <Providers>
-          <SiteShell>{children}</SiteShell>
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   )

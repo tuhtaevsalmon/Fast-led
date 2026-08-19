@@ -1,14 +1,13 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { PRODUCTS, getProduct, CATEGORY_LABEL } from "@/lib/products"
+import { CATEGORY_LABEL } from "@/lib/products"
 import { formatPitch } from "@/lib/format"
 import { ProductActions } from "@/components/catalog/product-actions"
 import { LedPreview } from "@/components/led-preview"
+import { getPublicProducts } from "@/lib/content/store"
 
-export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }))
-}
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({
   params,
@@ -16,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = (await getPublicProducts()).find((p) => p.slug === slug)
   if (!product) return { title: "Каталог" }
   return {
     title: `${product.name} — Fast LED`,
@@ -30,7 +29,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const product = getProduct(slug)
+  const product = (await getPublicProducts()).find((p) => p.slug === slug)
   if (!product) notFound()
 
   const specs = [
@@ -56,6 +55,7 @@ export default async function ProductPage({
         className="aspect-[4/3] lg:aspect-[4/5]"
         fit="contain"
         priority
+        unoptimized
       />
       <div>
         <Link href="/catalog" className="text-sm text-muted-foreground hover:text-foreground">

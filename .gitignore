@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -66,3 +67,8 @@ CLAUDE.md
 /public/led/project-resto.jpg
 /public/led/project-shop.jpg
 /public/led/rental-1.jpg
+
+# cms uploads (local)
+/public/uploads/*
+!/public/uploads/.gitkeep
+/data/site.json

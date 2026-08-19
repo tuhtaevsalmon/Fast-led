@@ -1,6 +1,10 @@
 import { CatalogView } from "@/components/catalog/catalog-view"
+import { getPublicProducts } from "@/lib/content/store"
 
-export default function CatalogPage() {
+export const dynamic = "force-dynamic"
+
+export default async function CatalogPage() {
+  const products = await getPublicProducts()
   return (
     <div className="page-shell py-8 sm:py-12 lg:py-16">
       <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Каталог</h1>
@@ -8,7 +12,7 @@ export default function CatalogPage() {
         Реальные линейки Absen, Unilumin и Leyard. Цены — поставка и монтаж в Таджикистане, TJS.
       </p>
       <div className="mt-8 sm:mt-10">
-        <CatalogView />
+        <CatalogView products={products} />
       </div>
     </div>
   )

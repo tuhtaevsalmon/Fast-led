@@ -1,15 +1,15 @@
 "use client"
 
 import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { createJSONStorage, persist } from "zustand/middleware"
 import { formatPitch } from "@/lib/format"
 import { PRODUCTS } from "@/lib/products"
 import type { CartItem } from "@/lib/types"
 
-function syncCartItem(item: CartItem): CartItem | null {
+function syncCartItem(item: CartItem): CartItem {
   if (item.kind !== "product" || !item.productId) return item
   const product = PRODUCTS.find((p) => p.id === item.productId)
-  if (!product) return null
+  if (!product) return item
   return {
     ...item,
     name: product.name,
@@ -51,13 +51,11 @@ export const useCart = create<CartState>()(
             items: get().items.map((i) =>
               i.id === existing.id ? { ...i, qty: i.qty + item.qty } : i
             ),
-            cartOpen: true,
           })
           return
         }
         set({
           items: [...get().items, { ...item, id }],
-          cartOpen: true,
         })
       },
       removeItem: (id) =>
@@ -75,13 +73,13 @@ export const useCart = create<CartState>()(
     }),
     {
       name: "led-dushanbe-cart",
+      storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({ items: s.items }),
+      skipHydration: true,
       merge: (persisted, current) => {
         const stored = persisted as Partial<CartState> | undefined
-        const items = (stored?.items ?? [])
-          .map(syncCartItem)
-          .filter((item): item is CartItem => item !== null)
-        return { ...current, ...stored, items }
+        const items = (stored?.items ?? []).map(syncCartItem)
+        return { ...current, items }
       },
     }
   )

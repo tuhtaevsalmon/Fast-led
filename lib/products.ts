@@ -27,6 +27,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 20350,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 210,
     image: "/led/absen-klcob-p12.png",
@@ -47,6 +48,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 11100,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 200,
     image: "/led/unilumin-uslim-iii.png",
@@ -67,6 +69,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 9250,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 190,
     image: "/led/leyard-tvf-p18.png",
@@ -87,6 +90,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 6010,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 222,
     image: "/led/absen-polaris.png",
@@ -107,6 +111,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 3890,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 230,
     image: "/led/absen-pl25-plus.png",
@@ -127,6 +132,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 10180,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 195,
     image: "/led/unilumin-upanel.png",
@@ -147,6 +153,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 8330,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 205,
     image: "/led/absen-a-series-p4.png",
@@ -167,6 +174,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 6010,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 215,
     image: "/led/unilumin-usurface-p5.png",
@@ -187,6 +195,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 4630,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 185,
     image: "/led/absen-a-series-p66.png",
@@ -207,6 +216,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 3520,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 175,
     image: "/led/absen-a-series-p10.png",
@@ -227,6 +237,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 8790,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "m2",
     hue: 250,
     image: "/led/unilumin-uglass.png",
@@ -247,6 +258,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 4160,
     inStock: true,
     hit: true,
+    hidden: false,
     unit: "cabinet",
     hue: 265,
     image: "/led/unilumin-upad-iv.png",
@@ -267,6 +279,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 3240,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "cabinet",
     hue: 280,
     image: "/led/absen-pl39-pro.png",
@@ -287,9 +300,10 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 7400,
     inStock: true,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 320,
-    image: "/led/unilumin-flexible-p2.png",
+    image: "/led/unilumin-flexible-p2-v2.png",
     description:
       "Гибкий модуль Unilumin для колонн и арок. Гнётся без видимой сетки — брендовые зоны и шоурумы.",
   },
@@ -307,6 +321,7 @@ export const PRODUCTS: Product[] = [
     pricePerM2Tjs: 5370,
     inStock: false,
     hit: false,
+    hidden: false,
     unit: "m2",
     hue: 330,
     image: "/led/absen-flexible-p25.png",
@@ -315,16 +330,18 @@ export const PRODUCTS: Product[] = [
   },
 ]
 
-export function getProduct(slug: string) {
-  return PRODUCTS.find((p) => p.slug === slug)
+export function getProduct(slug: string, products = PRODUCTS) {
+  return products.find((p) => p.slug === slug && !p.hidden)
 }
 
-export function priceBounds() {
-  const prices = PRODUCTS.map((p) => p.pricePerM2Tjs)
+export function priceBounds(products = PRODUCTS) {
+  const list = products.length ? products : PRODUCTS
+  const prices = list.map((p) => p.pricePerM2Tjs)
   return { min: Math.min(...prices), max: Math.max(...prices) }
 }
 
-export function brightnessBounds() {
-  const values = PRODUCTS.map((p) => p.brightness)
+export function brightnessBounds(products = PRODUCTS) {
+  const list = products.length ? products : PRODUCTS
+  const values = list.map((p) => p.brightness)
   return { min: Math.min(...values), max: Math.max(...values) }
 }
