@@ -115,17 +115,17 @@ export function OrderForm({
       <div className={cn("space-y-2 pt-1", alignBottom && "lg:mt-auto")}>
         <Button
           type="submit"
-          variant="outline"
-          className={cn(
-            "w-full border-primary/25 bg-primary/12 text-sm font-medium text-primary hover:bg-primary/18",
-            compact ? "h-9" : "h-10"
-          )}
+          className={cn("w-full", compact ? "h-11" : "h-12")}
         >
           {submitLabel}
         </Button>
         <Button
           type="button"
-          className={cn("w-full", compact ? "h-11" : "h-12")}
+          variant="outline"
+          className={cn(
+            "w-full border-primary/25 bg-primary/12 text-sm font-medium text-primary hover:bg-primary/18",
+            compact ? "h-9" : "h-10"
+          )}
           nativeButton={false}
           render={<a href={telHref(settings)} />}
         >
