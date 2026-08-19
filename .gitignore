@@ -39,3 +39,30 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent files from next dev
+AGENTS.md
+CLAUDE.md
+
+# create-next-app leftovers
+/public/file.svg
+/public/globe.svg
+/public/next.svg
+/public/vercel.svg
+/public/window.svg
+
+# unused photos
+/public/logo.png
+/public/led/hero.jpg
+/public/led/hero.png
+/public/led/absen-klcob.png
+/public/led/unilumin-uslim.png
+/public/led/indoor-1.jpg
+/public/led/indoor-4.jpg
+/public/led/outdoor-1.jpg
+/public/led/outdoor-2.jpg
+/public/led/project-facade.jpg
+/public/led/project-mall.jpg
+/public/led/project-resto.jpg
+/public/led/project-shop.jpg
+/public/led/rental-1.jpg
