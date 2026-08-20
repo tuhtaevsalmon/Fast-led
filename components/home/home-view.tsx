@@ -121,6 +121,7 @@ export function HomeView({
             <PowerOn>
               <LedPreview
                 src={hero.image}
+                srcDark={hero.imageDark || undefined}
                 alt={hero.title}
                 className="aspect-[16/10] w-full lg:aspect-[5/4] xl:aspect-[16/11]"
                 caption={hero.title}

@@ -65,6 +65,8 @@ export type SiteSettings = {
 /** Big product card on the homepage hero */
 export type HomeHero = {
   image: string
+  /** Dark-theme photo. Empty = same image for both themes. */
+  imageDark: string
   title: string
   caption: string
 }

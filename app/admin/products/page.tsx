@@ -16,7 +16,10 @@ export default async function AdminProductsPage() {
           >
             <div className="min-w-0">
               <p className="text-sm font-medium">{hero.title}</p>
-              <p className="truncate text-xs text-muted-foreground">{hero.caption}</p>
+              <p className="truncate text-xs text-muted-foreground">
+                {hero.caption}
+                {hero.imageDark ? " · 2 фото (светлая / тёмная)" : " · 1 фото"}
+              </p>
             </div>
             <span className="shrink-0 text-xs text-primary">Изменить</span>
           </Link>

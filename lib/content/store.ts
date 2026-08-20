@@ -17,7 +17,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 }
 
 export const DEFAULT_HERO: HomeHero = {
-  image: "/led/hero-stage.png",
+  image: "/led/hero-stage-light.png",
+  imageDark: "/led/hero-stage.png",
   title: "Unilumin Upad IV P2.6",
   caption: "Шаг 2,6 мм · 4500 нит · IP65",
 }
@@ -52,13 +53,15 @@ function normalize(raw: Partial<SiteContent> | null): SiteContent {
     settings.phoneTel = base.settings.phoneTel
     settings.whatsapp = base.settings.whatsapp
   }
-  const hero = {
-    ...base.hero,
-    ...(raw.hero ?? {}),
-  }
-  if (!hero.image?.trim()) hero.image = base.hero.image
-  if (!hero.title?.trim()) hero.title = base.hero.title
-  if (!hero.caption?.trim()) hero.caption = base.hero.caption
+  const heroRaw = raw.hero
+  const hero: HomeHero = heroRaw
+    ? {
+        image: heroRaw.image?.trim() || base.hero.image,
+        imageDark: String(heroRaw.imageDark ?? "").trim(),
+        title: heroRaw.title?.trim() || base.hero.title,
+        caption: heroRaw.caption?.trim() || base.hero.caption,
+      }
+    : { ...base.hero }
   return {
     settings,
     hero,

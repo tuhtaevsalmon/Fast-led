@@ -1,8 +1,13 @@
+"use client"
+
 import Image from "next/image"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 
 export function LedPreview({
   src,
+  srcDark,
   alt = "",
   className,
   label,
@@ -16,6 +21,8 @@ export function LedPreview({
   unoptimized = false,
 }: {
   src: string
+  /** Optional dark-theme image; shown when dark theme is active */
+  srcDark?: string
   alt?: string
   className?: string
   label?: string
@@ -28,11 +35,21 @@ export function LedPreview({
   sizes?: string
   unoptimized?: boolean
 }) {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const showDark = Boolean(srcDark && mounted && resolvedTheme === "dark")
+
   if (!src) {
     return (
       <div className={cn("media-frame bg-muted", className)} aria-hidden />
     )
   }
+  const imageClass = cn(
+    fit === "contain" ? "object-contain" : "object-cover",
+    fit === "cover" &&
+      "transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+  )
   return (
     <div className={cn("media-frame relative overflow-hidden", className)}>
       <div
@@ -42,20 +59,39 @@ export function LedPreview({
         )}
       >
         <div className="relative h-full w-full">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            priority={priority}
-            quality={quality}
-            sizes={sizes}
-            unoptimized={unoptimized || src.startsWith("http")}
+          <div
             className={cn(
-              fit === "contain" ? "object-contain" : "object-cover",
-              fit === "cover" &&
-                "transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              "absolute inset-0",
+              srcDark && showDark && "hidden"
             )}
-          />
+          >
+            <Image
+              src={src}
+              alt={showDark ? "" : alt}
+              fill
+              priority={priority}
+              quality={quality}
+              sizes={sizes}
+              unoptimized={unoptimized || src.startsWith("http")}
+              className={imageClass}
+            />
+          </div>
+          {srcDark ? (
+            <div
+              className={cn("absolute inset-0", !showDark && "hidden")}
+            >
+              <Image
+                src={srcDark}
+                alt={showDark ? alt : ""}
+                fill
+                priority={priority}
+                quality={quality}
+                sizes={sizes}
+                unoptimized={unoptimized || srcDark.startsWith("http")}
+                className={imageClass}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       {caption ? (

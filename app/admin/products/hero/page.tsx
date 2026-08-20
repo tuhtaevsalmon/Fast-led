@@ -10,14 +10,14 @@ export default async function AdminHeroPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Главная · большой блок</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Фото и подпись справа на первом экране сайта.
+            Фото и подпись справа на первом экране. Можно одно фото или два — для светлой и тёмной темы.
           </p>
         </div>
         <Link href="/admin/products" className="text-sm text-muted-foreground hover:text-foreground">
           ← К товарам
         </Link>
       </div>
-      <div className="max-w-lg rounded-2xl border bg-card p-5">
+      <div className="max-w-2xl rounded-2xl border bg-card p-5">
         <HeroForm hero={hero} />
       </div>
     </div>
