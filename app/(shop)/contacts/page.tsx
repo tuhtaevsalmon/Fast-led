@@ -1,4 +1,5 @@
 import { Mail, MapPin, Phone } from "lucide-react"
+import { mapEmbedUrl } from "@/lib/content/urls"
 import { getSettings } from "@/lib/content/store"
 
 export const dynamic = "force-dynamic"
@@ -27,10 +28,10 @@ export default async function ContactsPage() {
       </div>
       <div className="mt-10 max-w-3xl overflow-hidden rounded-2xl ring-1 ring-black/5">
         <iframe
-          title="Шоурум Fast LED"
+          title={settings.address}
           className="h-52 w-full sm:h-72"
           loading="lazy"
-          src="https://maps.google.com/maps?q=Rudaki%20Avenue%20Dushanbe&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          src={mapEmbedUrl(settings, 15)}
         />
       </div>
     </div>

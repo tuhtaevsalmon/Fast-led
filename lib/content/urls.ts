@@ -30,6 +30,11 @@ export function telHref(settings: SiteSettings) {
   return digits ? `tel:+${digits}` : "tel:"
 }
 
+export function mapEmbedUrl(settings: SiteSettings, zoom = 14) {
+  const query = settings.address.trim() || "пр. Рудаки 36, Душанбе"
+  return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=${zoom}&ie=UTF8&iwloc=&output=embed`
+}
+
 export type LeadPayload = {
   name: string
   city: string

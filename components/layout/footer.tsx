@@ -5,7 +5,7 @@ import { ContactForm } from "@/app/(shop)/contacts/form"
 import { Logo } from "@/components/logo"
 import { Reveal } from "@/components/motion/reveal"
 import type { SiteSettings } from "@/lib/types"
-import { instagramLabel, instagramUrl } from "@/lib/content/urls"
+import { instagramLabel, instagramUrl, mapEmbedUrl } from "@/lib/content/urls"
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -47,10 +47,10 @@ export function Footer({ settings }: { settings: SiteSettings }) {
           </p>
           <div className="relative mt-auto min-h-56 flex-1 overflow-hidden rounded-xl ring-1 ring-black/5">
             <iframe
-              title="Карта Душанбе"
+              title={settings.address}
               className="absolute inset-0 h-full w-full border-0"
               loading="lazy"
-              src="https://maps.google.com/maps?q=Rudaki%20Avenue%20Dushanbe&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src={mapEmbedUrl(settings)}
             />
           </div>
         </div>
