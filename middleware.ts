@@ -7,8 +7,11 @@ let expectedToken: string | null = null
 
 async function tokenFromEnv() {
   if (expectedToken) return expectedToken
-  const password = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "fastled")
-  const secret = process.env.ADMIN_SECRET || password || "fastled-dev"
+  const secret =
+    process.env.ADMIN_SECRET ||
+    process.env.ADMIN_PASSWORD ||
+    (process.env.NODE_ENV === "production" ? "" : "fastled-dev")
+  if (!secret) return ""
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),

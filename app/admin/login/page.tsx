@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label"
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [busy, setBusy] = useState(false)
 
   return (
     <form
@@ -17,13 +19,16 @@ export default function AdminLoginPage() {
       onSubmit={async (e) => {
         e.preventDefault()
         setError("")
+        setBusy(true)
         const res = await fetch("/api/admin/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
+          body: JSON.stringify({ login, password }),
         })
+        setBusy(false)
         if (!res.ok) {
-          setError("Неверный пароль")
+          const data = await res.json().catch(() => ({}))
+          setError(data.error || "Неверный логин или пароль")
           return
         }
         router.push("/admin/products")
@@ -32,17 +37,27 @@ export default function AdminLoginPage() {
     >
       <h1 className="text-xl font-semibold tracking-tight">Вход в админку</h1>
       <div className="space-y-1.5">
+        <Label htmlFor="login">Логин</Label>
+        <Input
+          id="login"
+          autoComplete="username"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+        />
+      </div>
+      <div className="space-y-1.5">
         <Label htmlFor="password">Пароль</Label>
         <Input
           id="password"
           type="password"
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      <Button type="submit" className="w-full">
-        Войти
+      <Button type="submit" className="w-full" disabled={busy}>
+        {busy ? "Вход…" : "Войти"}
       </Button>
     </form>
   )

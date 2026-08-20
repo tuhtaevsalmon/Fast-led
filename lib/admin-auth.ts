@@ -1,16 +1,28 @@
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
+import { defaultPassword, verifyCredentials } from "@/lib/admin-credentials"
 
 const COOKIE = "fl_admin"
 
+/** Session signing secret — independent of the admin password. */
+export function adminSessionSecret() {
+  return (
+    process.env.ADMIN_SECRET ||
+    process.env.ADMIN_PASSWORD ||
+    (process.env.NODE_ENV === "production" ? "" : "fastled-dev")
+  )
+}
+
+/** @deprecated use verifyCredentials — kept for clarity in older routes */
 export function adminPassword() {
-  return process.env.ADMIN_PASSWORD || (process.env.NODE_ENV === "production" ? "" : "fastled")
+  return defaultPassword()
 }
 
 let tokenCache: string | null = null
 
 async function sign(value: string) {
-  const secret = process.env.ADMIN_SECRET || adminPassword() || "fastled-dev"
+  const secret = adminSessionSecret()
+  if (!secret) return ""
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -30,13 +42,18 @@ export async function sessionToken() {
 }
 
 export async function isAdminCookie(value?: string) {
-  if (!value || !adminPassword()) return false
-  return value === (await sessionToken())
+  if (!value || !adminSessionSecret()) return false
+  const expected = await sessionToken()
+  return Boolean(expected) && value === expected
 }
 
 export async function isAdminRequest() {
   const jar = await cookies()
   return isAdminCookie(jar.get(COOKIE)?.value)
+}
+
+export async function checkLogin(login: string, password: string) {
+  return verifyCredentials(login, password)
 }
 
 export function setAdminCookie(res: NextResponse, token: string) {
