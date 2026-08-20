@@ -10,8 +10,16 @@ export type AdminCredentials = {
 const LOCAL_FILE = path.join(process.cwd(), "data", "admin.json")
 const BLOB_KEY = "cms/admin.json"
 
+function hasBlobToken() {
+  return Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+}
+
 function useRemoteBlob() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN && process.env.VERCEL)
+  return hasBlobToken() && Boolean(process.env.VERCEL)
+}
+
+function isVercelRuntime() {
+  return Boolean(process.env.VERCEL)
 }
 
 export function defaultLogin() {
@@ -78,7 +86,7 @@ async function readBlobCredentials(): Promise<AdminCredentials | null> {
 }
 
 async function writeBlobCredentials(creds: AdminCredentials) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return false
+  if (!hasBlobToken()) return false
   try {
     const { put } = await import("@vercel/blob")
     await put(BLOB_KEY, JSON.stringify(creds, null, 2), {
@@ -89,7 +97,8 @@ async function writeBlobCredentials(creds: AdminCredentials) {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     })
     return true
-  } catch {
+  } catch (e) {
+    console.error("admin credentials blob write failed", e)
     return false
   }
 }
@@ -131,10 +140,17 @@ export async function readCredentials(): Promise<AdminCredentials | null> {
 
 export async function writeCredentials(creds: AdminCredentials) {
   mem = creds
-  if (useRemoteBlob()) {
+  if (hasBlobToken()) {
     const ok = await writeBlobCredentials(creds)
-    if (!ok) throw new Error("Не удалось сохранить логин. Проверьте BLOB_READ_WRITE_TOKEN.")
+    if (!ok) {
+      throw new Error("Не удалось сохранить. Проверьте BLOB_READ_WRITE_TOKEN на Vercel.")
+    }
     return
+  }
+  if (isVercelRuntime()) {
+    throw new Error(
+      "На сервере нужен Vercel Blob. Добавьте BLOB_READ_WRITE_TOKEN в Environment Variables и сделайте redeploy."
+    )
   }
   await mkdir(path.dirname(LOCAL_FILE), { recursive: true })
   await writeFile(LOCAL_FILE, JSON.stringify(creds, null, 2), "utf8")
