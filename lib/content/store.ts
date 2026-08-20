@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
 import { PRODUCTS } from "@/lib/products"
 import { PROJECTS } from "@/lib/portfolio"
-import { hasBlobToken, putBlob, readBlobText, useRemoteBlob } from "@/lib/content/blob"
+import { hasBlobToken, putBlob, readBlobText, toDisplayImageUrl, useRemoteBlob } from "@/lib/content/blob"
 import type { HomeHero, Product, Project, SiteContent, SiteSettings } from "@/lib/types"
 
 const LOCAL_FILE = path.join(process.cwd(), "data", "site.json")
@@ -64,14 +64,20 @@ function normalize(raw: Partial<SiteContent> | null): SiteContent {
     : { ...base.hero }
   return {
     settings,
-    hero,
+    hero: {
+      ...hero,
+      image: toDisplayImageUrl(hero.image),
+      imageDark: toDisplayImageUrl(hero.imageDark),
+    },
     products: (raw.products ?? base.products).map((p) => ({
       ...p,
       hidden: Boolean(p.hidden),
+      image: toDisplayImageUrl(p.image),
     })),
     projects: (raw.projects ?? base.projects).slice(0, 3).map((p) => ({
       ...p,
       showOnHome: true,
+      image: toDisplayImageUrl(p.image),
     })),
   }
 }

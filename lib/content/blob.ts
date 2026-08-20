@@ -24,6 +24,22 @@ export function hasBlobToken() {
   return Boolean(blobToken()) || hasOidcBlobAuth()
 }
 
+// Rewrites direct "private" Blob URLs to go through our /api/media proxy,
+// since those URLs 403 when the browser requests them without a signed
+// token. Public blob URLs and local /uploads paths are left untouched.
+export function toDisplayImageUrl(image: string | undefined | null): string {
+  if (!image) return image ?? ""
+  try {
+    const url = new URL(image)
+    if (url.hostname.endsWith(".private.blob.vercel-storage.com")) {
+      return `/api/media${url.pathname}`
+    }
+  } catch {
+    // Relative path (e.g. /uploads/x.png or /led/x.png) — nothing to rewrite.
+  }
+  return image
+}
+
 export function useRemoteBlob() {
   return hasBlobToken() && Boolean(process.env.VERCEL)
 }
@@ -74,6 +90,38 @@ export async function putBlob(
       console.error("blob put failed", first, second)
       throw new Error(message)
     }
+  }
+}
+
+// Streams a blob's raw bytes + content type, trying both access levels.
+// Used to proxy files (e.g. uploaded images) through our own API route so
+// the browser never needs a direct, possibly-private, blob URL.
+export async function readBlobFile(
+  pathname: string
+): Promise<{ stream: ReadableStream<Uint8Array>; contentType: string | null } | null> {
+  const { get, list } = await import("@vercel/blob")
+  const auth = blobAuth()
+
+  for (const access of ["private", "public"] as const) {
+    try {
+      const result = await get(pathname, { access, useCache: false, ...auth })
+      if (result?.statusCode === 200 && result.stream) {
+        return { stream: result.stream, contentType: result.blob.contentType }
+      }
+    } catch {
+      /* try next */
+    }
+  }
+
+  try {
+    const { blobs } = await list({ prefix: pathname, limit: 5, ...auth })
+    const file = blobs.find((b) => b.pathname === pathname) ?? blobs[0]
+    if (!file) return null
+    const res = await fetch(file.url, { cache: "no-store" })
+    if (!res.ok || !res.body) return null
+    return { stream: res.body, contentType: res.headers.get("content-type") }
+  } catch {
+    return null
   }
 }
 
