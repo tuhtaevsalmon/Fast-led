@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FilePickButton } from "@/components/admin/file-pick-button"
+import { parseResponse, errorMessage } from "@/lib/admin-fetch"
 
 export function ProjectForm({ project }: { project?: Project }) {
   const router = useRouter()
@@ -34,9 +35,9 @@ export function ProjectForm({ project }: { project?: Project }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         })
-        const data = await res.json().catch(() => ({}))
-        if (!res.ok) {
-          setError(data.error || "Ошибка")
+        const { ok, data } = await parseResponse(res)
+        if (!ok) {
+          setError(errorMessage(res, data))
           return
         }
         router.push("/admin/projects")
@@ -93,9 +94,9 @@ export function ProjectForm({ project }: { project?: Project }) {
               setError("Нет соединения с сервером")
               return
             }
-            const data = await res.json().catch(() => ({}))
-            if (res.ok) setImage(data.image)
-            else setError(data.error || "Ошибка загрузки")
+            const { ok, data } = await parseResponse(res)
+            if (ok) setImage(typeof data.image === "string" ? data.image : "")
+            else setError(errorMessage(res, data, "Ошибка загрузки"))
           }}
         />
         {image && !isNew && project ? (
@@ -106,9 +107,9 @@ export function ProjectForm({ project }: { project?: Project }) {
               setError("")
               try {
                 const res = await fetch(`/api/admin/projects/${project.id}/image`, { method: "DELETE" })
-                const data = await res.json().catch(() => ({}))
-                if (!res.ok) {
-                  setError(data.error || "Ошибка удаления")
+                const { ok, data } = await parseResponse(res)
+                if (!ok) {
+                  setError(errorMessage(res, data, "Ошибка удаления"))
                   return
                 }
               } catch {

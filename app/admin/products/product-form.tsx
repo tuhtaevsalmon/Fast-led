@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { FilePickButton } from "@/components/admin/file-pick-button"
+import { parseResponse, errorMessage } from "@/lib/admin-fetch"
 import {
   Select,
   SelectContent,
@@ -60,10 +61,10 @@ export function ProductForm({ product }: { product?: Product }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-    const data = await res.json().catch(() => ({}))
+    const { ok, data } = await parseResponse(res)
     setBusy(false)
-    if (!res.ok) {
-      setError(data.error || "Не удалось сохранить")
+    if (!ok) {
+      setError(errorMessage(res, data, "Не удалось сохранить"))
       return
     }
     router.push("/admin/products")
@@ -85,12 +86,12 @@ export function ProductForm({ product }: { product?: Product }) {
       setError("Нет соединения с сервером")
       return
     }
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) {
-      setError(data.error || "Ошибка загрузки")
+    const { ok, data } = await parseResponse(res)
+    if (!ok) {
+      setError(errorMessage(res, data))
       return
     }
-    setImage(data.image)
+    setImage(typeof data.image === "string" ? data.image : "")
     router.refresh()
   }
 
@@ -99,9 +100,9 @@ export function ProductForm({ product }: { product?: Product }) {
     setError("")
     try {
       const res = await fetch(`/api/admin/products/${product.id}/image`, { method: "DELETE" })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setError(data.error || "Ошибка удаления")
+      const { ok, data } = await parseResponse(res)
+      if (!ok) {
+        setError(errorMessage(res, data))
         return
       }
     } catch {
