@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { ProductCarousel } from "@/components/catalog/product-carousel"
 import { LedPreview } from "@/components/led-preview"
@@ -13,7 +14,37 @@ import {
 import { Button } from "@/components/ui/button"
 import type { Product, Project } from "@/lib/types"
 
-const BRANDS = ["Absen", "Unilumin", "Leyard", "NovaStar"]
+const BRANDS = [
+  {
+    name: "Absen",
+    src: "/brands/absen-w.png",
+    width: 150,
+    height: 50,
+    className: "h-[22px] w-auto sm:h-[26px]",
+  },
+  {
+    name: "Unilumin",
+    src: "/brands/unilumin-clear.png",
+    width: 148,
+    height: 27,
+    className: "h-[14px] w-auto sm:h-[18px]",
+  },
+  {
+    name: "Leyard",
+    src: "/brands/leyard.png",
+    width: 170,
+    height: 15,
+    className: "h-[9px] w-auto sm:h-[13px]",
+  },
+  {
+    name: "NovaStar",
+    src: "/brands/novastar.png",
+    width: 156,
+    height: 28,
+    className: "h-[25px] w-auto sm:h-[29px]",
+  },
+]
+
 
 const HERO_STATS = [
   { kind: "count" as const, value: 100, suffix: "+", label: "объектов" },
@@ -105,17 +136,18 @@ export function HomeView({
       </section>
 
       <Reveal as="section" className="border-y border-black/5 dark:border-white/10">
-        <div className="page-shell flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-6 sm:gap-x-12 sm:py-8">
-          <p className="w-full text-center text-[11px] tracking-[0.18em] text-muted-foreground uppercase sm:w-auto sm:text-left">
-            Поставляем
-          </p>
+        <div className="page-shell flex flex-wrap items-center justify-center gap-x-8 gap-y-4 py-7 sm:gap-x-12 sm:py-9 lg:gap-x-16">
           {BRANDS.map((brand) => (
-            <p
-              key={brand}
-              className="text-sm font-semibold tracking-tight text-foreground/80 sm:text-base"
-            >
-              {brand}
-            </p>
+            <div key={brand.name} className="flex h-8 items-center justify-center sm:h-9">
+              <Image
+                src={brand.src}
+                alt={brand.name}
+                width={brand.width}
+                height={brand.height}
+                unoptimized
+                className={`object-contain ${brand.className}`}
+              />
+            </div>
           ))}
         </div>
       </Reveal>

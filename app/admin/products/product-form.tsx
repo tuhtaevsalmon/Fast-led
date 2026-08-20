@@ -204,9 +204,19 @@ export function ProductForm({ product }: { product?: Product }) {
         ) : null}
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      <Button type="submit" disabled={busy}>
-        {busy ? "Сохранение…" : "Сохранить"}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="submit" disabled={busy}>
+          {busy ? "Сохранение…" : "Сохранить"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={() => router.push("/admin/products")}
+        >
+          Отменить
+        </Button>
+      </div>
     </form>
   )
 }
