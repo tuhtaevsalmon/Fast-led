@@ -1,18 +1,6 @@
 import { NextResponse } from "next/server"
 import { isAdminRequest } from "@/lib/admin-auth"
-import {
-  getAdminLoginLabel,
-  makeCredentials,
-  verifyCredentials,
-  writeCredentials,
-} from "@/lib/admin-credentials"
-
-export async function GET() {
-  if (!(await isAdminRequest())) {
-    return NextResponse.json({ error: "Нужен вход" }, { status: 401 })
-  }
-  return NextResponse.json({ login: await getAdminLoginLabel() })
-}
+import { makeCredentials, writeCredentials } from "@/lib/admin-credentials"
 
 export async function PUT(request: Request) {
   if (!(await isAdminRequest())) {
@@ -20,18 +8,10 @@ export async function PUT(request: Request) {
   }
   try {
     const body = await request.json().catch(() => ({}))
-    const currentLogin = String(body.currentLogin ?? "").trim()
-    const currentPassword = String(body.currentPassword ?? "")
-    const newLogin = String(body.newLogin ?? currentLogin).trim()
+    const newLogin = String(body.newLogin ?? "").trim()
     const newPassword = String(body.newPassword ?? "")
     const confirmPassword = String(body.confirmPassword ?? "")
 
-    if (!currentLogin || !currentPassword) {
-      return NextResponse.json({ error: "Укажите текущий логин и пароль" }, { status: 400 })
-    }
-    if (!(await verifyCredentials(currentLogin, currentPassword))) {
-      return NextResponse.json({ error: "Текущий логин или пароль неверный" }, { status: 401 })
-    }
     if (newLogin.length < 3) {
       return NextResponse.json({ error: "Логин минимум 3 символа" }, { status: 400 })
     }

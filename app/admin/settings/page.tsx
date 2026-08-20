@@ -1,10 +1,9 @@
-import { getAdminLoginLabel } from "@/lib/admin-credentials"
 import { getSettings } from "@/lib/content/store"
 import { AccountForm } from "./account-form"
 import { SettingsForm } from "./settings-form"
 
 export default async function AdminSettingsPage() {
-  const [settings, login] = await Promise.all([getSettings(), getAdminLoginLabel()])
+  const settings = await getSettings()
   return (
     <div className="space-y-10">
       <div>
@@ -14,9 +13,9 @@ export default async function AdminSettingsPage() {
       <div>
         <h2 className="mb-2 text-xl font-semibold tracking-tight">Вход в админку</h2>
         <p className="mb-6 text-sm text-muted-foreground">
-          Смена логина и пароля. После сохранения входите уже новыми данными.
+          Новый логин и пароль. После сохранения входите уже этими данными.
         </p>
-        <AccountForm login={login} />
+        <AccountForm />
       </div>
     </div>
   )

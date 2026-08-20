@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function AccountForm({ login: initialLogin }: { login: string }) {
-  const [login, setLogin] = useState(initialLogin)
+export function AccountForm() {
   const [error, setError] = useState("")
   const [ok, setOk] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -24,8 +23,6 @@ export function AccountForm({ login: initialLogin }: { login: string }) {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            currentLogin: form.get("currentLogin"),
-            currentPassword: form.get("currentPassword"),
             newLogin: form.get("newLogin"),
             newPassword: form.get("newPassword"),
             confirmPassword: form.get("confirmPassword"),
@@ -37,31 +34,13 @@ export function AccountForm({ login: initialLogin }: { login: string }) {
           setError(data.error || "Ошибка")
           return
         }
-        if (data.login) setLogin(String(data.login))
         setOk(true)
         e.currentTarget.reset()
       }}
     >
-      <p className="text-sm text-muted-foreground">
-        Текущий логин: <span className="font-medium text-foreground">{login}</span>
-      </p>
-      <div className="space-y-1.5">
-        <Label htmlFor="currentLogin">Текущий логин</Label>
-        <Input id="currentLogin" name="currentLogin" defaultValue={login} required autoComplete="username" />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="currentPassword">Текущий пароль</Label>
-        <Input
-          id="currentPassword"
-          name="currentPassword"
-          type="password"
-          required
-          autoComplete="current-password"
-        />
-      </div>
       <div className="space-y-1.5">
         <Label htmlFor="newLogin">Новый логин</Label>
-        <Input id="newLogin" name="newLogin" defaultValue={login} required minLength={3} />
+        <Input id="newLogin" name="newLogin" required minLength={3} autoComplete="username" />
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="newPassword">Новый пароль</Label>
@@ -88,7 +67,7 @@ export function AccountForm({ login: initialLogin }: { login: string }) {
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {ok ? <p className="text-sm text-primary">Логин и пароль обновлены</p> : null}
       <Button type="submit" disabled={busy}>
-        {busy ? "Сохранение…" : "Сменить логин и пароль"}
+        {busy ? "Сохранение…" : "Сохранить"}
       </Button>
     </form>
   )
