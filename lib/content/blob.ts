@@ -1,5 +1,10 @@
 import type { PutBlobResult } from "@vercel/blob"
 
+// Mirrors the body type @vercel/blob's put() actually accepts.
+// Derived from the function itself (not re-declared by hand) so it can't drift out of sync,
+// since @vercel/blob does not publicly export its internal `PutBody` type.
+type PutBody = Parameters<typeof import("@vercel/blob").put>[1]
+
 export function blobToken() {
   return (process.env.BLOB_READ_WRITE_TOKEN || "").trim().replace(/^["']|["']$/g, "")
 }
@@ -27,7 +32,7 @@ function blobAuth() {
 
 export async function putBlob(
   pathname: string,
-  body: ConstructorParameters<typeof Blob>[0] | string | Buffer,
+  body: PutBody,
   options: {
     access?: "public" | "private"
     contentType: string
