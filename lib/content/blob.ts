@@ -13,8 +13,15 @@ export function blobStoreId() {
   return (process.env.BLOB_STORE_ID || "").trim().replace(/^["']|["']$/g, "")
 }
 
+// True when Vercel's OIDC auth is set up for this project's Blob store
+// (this is what "Connect to Project" wires up today; it does NOT set
+// BLOB_READ_WRITE_TOKEN, only VERCEL_OIDC_TOKEN + BLOB_STORE_ID).
+function hasOidcBlobAuth() {
+  return Boolean(process.env.VERCEL_OIDC_TOKEN) && Boolean(blobStoreId())
+}
+
 export function hasBlobToken() {
-  return Boolean(blobToken())
+  return Boolean(blobToken()) || hasOidcBlobAuth()
 }
 
 export function useRemoteBlob() {
