@@ -80,13 +80,20 @@ export function ProjectForm({ project }: { project?: Project }) {
               setError("Сначала сохраните проект, потом фото")
               return
             }
+            setError("")
             const form = new FormData()
             form.set("file", file)
-            const res = await fetch(`/api/admin/projects/${project.id}/image`, {
-              method: "POST",
-              body: form,
-            })
-            const data = await res.json()
+            let res: Response
+            try {
+              res = await fetch(`/api/admin/projects/${project.id}/image`, {
+                method: "POST",
+                body: form,
+              })
+            } catch {
+              setError("Нет соединения с сервером")
+              return
+            }
+            const data = await res.json().catch(() => ({}))
             if (res.ok) setImage(data.image)
             else setError(data.error || "Ошибка загрузки")
           }}
@@ -96,7 +103,18 @@ export function ProjectForm({ project }: { project?: Project }) {
             type="button"
             variant="outline"
             onClick={async () => {
-              await fetch(`/api/admin/projects/${project.id}/image`, { method: "DELETE" })
+              setError("")
+              try {
+                const res = await fetch(`/api/admin/projects/${project.id}/image`, { method: "DELETE" })
+                const data = await res.json().catch(() => ({}))
+                if (!res.ok) {
+                  setError(data.error || "Ошибка удаления")
+                  return
+                }
+              } catch {
+                setError("Нет соединения с сервером")
+                return
+              }
               setImage("")
             }}
           >

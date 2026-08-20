@@ -28,7 +28,6 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
               phone,
               instagram: form.get("instagram"),
               address: form.get("address"),
-              email: form.get("email"),
             },
           }),
         })
@@ -60,10 +59,6 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
       <div className="space-y-1.5">
         <Label htmlFor="address">Адрес шоурума</Label>
         <Input id="address" name="address" defaultValue={settings.address} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" defaultValue={settings.email} />
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {ok ? <p className="text-sm text-primary">Сохранено</p> : null}

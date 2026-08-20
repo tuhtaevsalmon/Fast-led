@@ -59,7 +59,6 @@ export type SiteSettings = {
   whatsapp: string
   instagram: string
   address: string
-  email: string
 }
 
 /** Big product card on the homepage hero */

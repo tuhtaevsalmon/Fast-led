@@ -14,7 +14,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   whatsapp: "992987139956",
   instagram: "fastled.tj",
   address: "пр. Рудаки 36, Душанбе",
-  email: "hello@fastled.tj",
 }
 
 export const DEFAULT_HERO: HomeHero = {

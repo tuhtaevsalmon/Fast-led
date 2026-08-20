@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from "lucide-react"
+import { MapPin, Phone } from "lucide-react"
 import { mapEmbedUrl } from "@/lib/content/urls"
 import { getSettings } from "@/lib/content/store"
 
@@ -20,10 +20,6 @@ export default async function ContactsPage() {
         <p className="flex gap-3">
           <Phone className="size-4" />
           {settings.phone}
-        </p>
-        <p className="flex gap-3">
-          <Mail className="size-4" />
-          {settings.email}
         </p>
       </div>
       <div className="mt-10 max-w-3xl overflow-hidden rounded-2xl ring-1 ring-black/5">

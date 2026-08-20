@@ -77,8 +77,15 @@ export function ProductForm({ product }: { product?: Product }) {
     }
     const form = new FormData()
     form.set("file", file)
-    const res = await fetch(`/api/admin/products/${product.id}/image`, { method: "POST", body: form })
-    const data = await res.json()
+    setError("")
+    let res: Response
+    try {
+      res = await fetch(`/api/admin/products/${product.id}/image`, { method: "POST", body: form })
+    } catch {
+      setError("Нет соединения с сервером")
+      return
+    }
+    const data = await res.json().catch(() => ({}))
     if (!res.ok) {
       setError(data.error || "Ошибка загрузки")
       return
@@ -89,7 +96,18 @@ export function ProductForm({ product }: { product?: Product }) {
 
   async function removeImage() {
     if (isNew || !product) return
-    await fetch(`/api/admin/products/${product.id}/image`, { method: "DELETE" })
+    setError("")
+    try {
+      const res = await fetch(`/api/admin/products/${product.id}/image`, { method: "DELETE" })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data.error || "Ошибка удаления")
+        return
+      }
+    } catch {
+      setError("Нет соединения с сервером")
+      return
+    }
     setImage("")
     router.refresh()
   }
