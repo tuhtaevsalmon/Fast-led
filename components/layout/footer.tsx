@@ -1,6 +1,9 @@
+"use client"
+
 import { MapPin, Phone } from "lucide-react"
 import { ContactForm } from "@/app/(shop)/contacts/form"
 import { Logo } from "@/components/logo"
+import { Reveal } from "@/components/motion/reveal"
 import type { SiteSettings } from "@/lib/types"
 import { instagramLabel, instagramUrl } from "@/lib/content/urls"
 
@@ -15,7 +18,7 @@ function InstagramIcon({ className }: { className?: string }) {
 export function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer id="lead" className="mt-auto scroll-mt-20 border-t bg-white dark:bg-background">
-      <div className="page-shell grid gap-10 py-8 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:py-10">
+      <Reveal className="page-shell grid gap-10 py-8 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:py-10">
         <div className="flex h-full min-w-0 flex-col gap-5">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <Logo />
@@ -60,7 +63,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             <ContactForm compact alignBottom settings={settings} />
           </div>
         </div>
-      </div>
+      </Reveal>
       <div className="border-t py-3 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} Fast LED
       </div>

@@ -171,3 +171,44 @@
 .animate-page-in {
   animation: page-in 0.35s ease-out;
 }
+
+.motion-reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.motion-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.motion-power {
+  opacity: 0.72;
+  transform: scale(1.025);
+  filter: saturate(0.92) brightness(0.97);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.7s ease;
+  will-change: opacity, transform, filter;
+}
+
+.motion-power.is-on {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-reveal,
+  .motion-power {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
