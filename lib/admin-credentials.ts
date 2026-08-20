@@ -51,7 +51,13 @@ export async function makeCredentials(login: string, password: string): Promise<
 }
 
 let mem: AdminCredentials | null | undefined
+let memAt = 0
 let inflight: Promise<AdminCredentials | null> | null = null
+
+// See lib/content/store.ts for why this needs a TTL: each Vercel serverless
+// instance has its own module-scope cache, so a credentials change made in
+// one invocation doesn't invalidate the cache read by another.
+const CACHE_TTL_MS = 5_000
 
 async function readBlobCredentials(): Promise<AdminCredentials | null> {
   if (!useRemoteBlob()) return null
@@ -108,11 +114,12 @@ async function loadCredentials(): Promise<AdminCredentials | null> {
 }
 
 export async function readCredentials(): Promise<AdminCredentials | null> {
-  if (mem !== undefined) return mem
+  if (mem !== undefined && Date.now() - memAt < CACHE_TTL_MS) return mem
   if (!inflight) {
     inflight = loadCredentials()
       .then((data) => {
         mem = data
+        memAt = Date.now()
         return data
       })
       .finally(() => {
@@ -124,6 +131,7 @@ export async function readCredentials(): Promise<AdminCredentials | null> {
 
 export async function writeCredentials(creds: AdminCredentials) {
   mem = creds
+  memAt = Date.now()
   if (hasBlobToken()) {
     const ok = await writeBlobCredentials(creds)
     if (!ok) {

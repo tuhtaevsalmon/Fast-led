@@ -104,7 +104,15 @@ async function writeBlob(content: SiteContent) {
 }
 
 let mem: SiteContent | null = null
+let memAt = 0
 let inflight: Promise<SiteContent> | null = null
+
+// Each serverless instance on Vercel keeps its own module-scope cache, so a
+// write from one function invocation never invalidates the cache in another
+// (e.g. an admin API route vs. a public page). A short TTL keeps reads fast
+// within a single request/instance while still picking up edits quickly
+// instead of only after a cold start / redeploy.
+const CACHE_TTL_MS = 5_000
 
 async function loadSite(): Promise<SiteContent> {
   const fromBlob = await readBlob()
@@ -119,11 +127,12 @@ async function loadSite(): Promise<SiteContent> {
 }
 
 export async function readSite(): Promise<SiteContent> {
-  if (mem) return mem
+  if (mem && Date.now() - memAt < CACHE_TTL_MS) return mem
   if (!inflight) {
     inflight = loadSite()
       .then((data) => {
         mem = data
+        memAt = Date.now()
         return data
       })
       .finally(() => {
@@ -136,6 +145,7 @@ export async function readSite(): Promise<SiteContent> {
 export async function writeSite(content: SiteContent) {
   const next = normalize(content)
   mem = next
+  memAt = Date.now()
   if (useRemoteBlob()) {
     const blobOk = await writeBlob(next)
     if (!blobOk) {
