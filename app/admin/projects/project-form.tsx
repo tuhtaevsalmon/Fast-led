@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FilePickButton } from "@/components/admin/file-pick-button"
 
 export function ProjectForm({ project }: { project?: Project }) {
   const router = useRouter()
@@ -72,14 +73,11 @@ export function ProjectForm({ project }: { project?: Project }) {
         ) : (
           <p className="text-sm text-muted-foreground">Нет фото</p>
         )}
-        <Input
-          type="file"
-          accept="image/*"
+        <FilePickButton
           disabled={isNew}
-          onChange={async (e) => {
-            const file = e.target.files?.[0]
-            if (!file || isNew || !project) {
-              if (isNew) setError("Сначала сохраните проект, потом фото")
+          onFile={async (file) => {
+            if (isNew || !project) {
+              setError("Сначала сохраните проект, потом фото")
               return
             }
             const form = new FormData()

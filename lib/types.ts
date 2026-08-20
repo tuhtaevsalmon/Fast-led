@@ -62,8 +62,16 @@ export type SiteSettings = {
   email: string
 }
 
+/** Big product card on the homepage hero */
+export type HomeHero = {
+  image: string
+  title: string
+  caption: string
+}
+
 export type SiteContent = {
   settings: SiteSettings
+  hero: HomeHero
   products: Product[]
   projects: Project[]
 }

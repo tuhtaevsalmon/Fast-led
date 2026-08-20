@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { FilePickButton } from "@/components/admin/file-pick-button"
 import {
   Select,
   SelectContent,
@@ -184,14 +185,9 @@ export function ProductForm({ product }: { product?: Product }) {
           <p className="text-sm text-muted-foreground">Нет фото</p>
         )}
         <div className="flex flex-wrap gap-2">
-          <Input
-            type="file"
-            accept="image/*"
-            disabled={isNew}
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) void upload(file)
-            }}
+          <FilePickButton
+            disabled={isNew || busy}
+            onFile={(file) => void upload(file)}
           />
           {image ? (
             <Button type="button" variant="outline" onClick={() => void removeImage()}>

@@ -12,7 +12,7 @@ import {
   StaggerItem,
 } from "@/components/motion/reveal"
 import { Button } from "@/components/ui/button"
-import type { Product, Project } from "@/lib/types"
+import type { HomeHero, Product, Project } from "@/lib/types"
 
 const BRANDS = [
   {
@@ -55,9 +55,11 @@ const HERO_STATS = [
 export function HomeView({
   products,
   projects,
+  hero,
 }: {
   products: Product[]
   projects: Project[]
+  hero: HomeHero
 }) {
   return (
     <div>
@@ -118,13 +120,13 @@ export function HomeView({
           <Parallax strength={0.03}>
             <PowerOn>
               <LedPreview
-                src="/led/unilumin-upad-iv.png"
-                alt="Сценический LED Unilumin Upad IV"
+                src={hero.image}
+                alt={hero.title}
                 className="aspect-[16/10] w-full lg:aspect-[5/4] xl:aspect-[16/11]"
-                caption="Unilumin Upad IV P2.6"
-                captionHint="Шаг 2,6 мм · 4500 нит · IP65"
+                caption={hero.title}
+                captionHint={hero.caption}
                 captionAlways
-                fit="contain"
+                fit="cover"
                 quality={100}
                 unoptimized
                 sizes="(max-width: 1024px) 100vw, 60vw"

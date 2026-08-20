@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
 import { PRODUCTS } from "@/lib/products"
 import { PROJECTS } from "@/lib/portfolio"
-import type { Product, Project, SiteContent, SiteSettings } from "@/lib/types"
+import type { HomeHero, Product, Project, SiteContent, SiteSettings } from "@/lib/types"
 
 const LOCAL_FILE = path.join(process.cwd(), "data", "site.json")
 const BLOB_KEY = "cms/site.json"
@@ -16,9 +16,16 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   email: "hello@fastled.tj",
 }
 
+export const DEFAULT_HERO: HomeHero = {
+  image: "/led/hero-stage.png",
+  title: "Unilumin Upad IV P2.6",
+  caption: "Шаг 2,6 мм · 4500 нит · IP65",
+}
+
 function seed(): SiteContent {
   return {
     settings: DEFAULT_SETTINGS,
+    hero: { ...DEFAULT_HERO },
     products: PRODUCTS.map((p) => ({ ...p, hidden: p.hidden ?? false })),
     projects: PROJECTS.slice(0, 3).map((p) => ({
       id: p.id,
@@ -45,8 +52,16 @@ function normalize(raw: Partial<SiteContent> | null): SiteContent {
     settings.phoneTel = base.settings.phoneTel
     settings.whatsapp = base.settings.whatsapp
   }
+  const hero = {
+    ...base.hero,
+    ...(raw.hero ?? {}),
+  }
+  if (!hero.image?.trim()) hero.image = base.hero.image
+  if (!hero.title?.trim()) hero.title = base.hero.title
+  if (!hero.caption?.trim()) hero.caption = base.hero.caption
   return {
     settings,
+    hero,
     products: (raw.products ?? base.products).map((p) => ({
       ...p,
       hidden: Boolean(p.hidden),
@@ -175,6 +190,10 @@ export async function getHomeProjects(): Promise<Project[]> {
 
 export async function getSettings(): Promise<SiteSettings> {
   return (await readSite()).settings
+}
+
+export async function getHomeHero(): Promise<HomeHero> {
+  return (await readSite()).hero
 }
 
 export async function saveUploadedFile(file: File, folder: string) {
