@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: "Fast LED — светодиодные экраны",
   description:
     "Продажа и монтаж LED-экранов под ключ в Душанбе и Таджикистане. Гарантия до 3 лет.",
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/icon.png" }],
+  },
 }
 
 export const viewport: Viewport = {

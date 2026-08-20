@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
+import { hasBlobToken, putBlob, readBlobText, useRemoteBlob } from "@/lib/content/blob"
 
 export type AdminCredentials = {
   login: string
@@ -9,14 +10,6 @@ export type AdminCredentials = {
 
 const LOCAL_FILE = path.join(process.cwd(), "data", "admin.json")
 const BLOB_KEY = "cms/admin.json"
-
-function hasBlobToken() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN)
-}
-
-function useRemoteBlob() {
-  return hasBlobToken() && Boolean(process.env.VERCEL)
-}
 
 function isVercelRuntime() {
   return Boolean(process.env.VERCEL)
@@ -63,20 +56,14 @@ let inflight: Promise<AdminCredentials | null> | null = null
 async function readBlobCredentials(): Promise<AdminCredentials | null> {
   if (!useRemoteBlob()) return null
   try {
-    const { get } = await import("@vercel/blob")
-    const result = await get(BLOB_KEY, {
-      access: "private",
-      useCache: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    })
-    if (result?.statusCode === 200 && result.stream) {
-      const raw = JSON.parse(await new Response(result.stream).text()) as Partial<AdminCredentials>
-      if (raw.login && raw.salt && raw.passwordHash) {
-        return {
-          login: String(raw.login),
-          salt: String(raw.salt),
-          passwordHash: String(raw.passwordHash),
-        }
+    const text = await readBlobText(BLOB_KEY)
+    if (!text) return null
+    const raw = JSON.parse(text) as Partial<AdminCredentials>
+    if (raw.login && raw.salt && raw.passwordHash) {
+      return {
+        login: String(raw.login),
+        salt: String(raw.salt),
+        passwordHash: String(raw.passwordHash),
       }
     }
   } catch {
@@ -88,13 +75,10 @@ async function readBlobCredentials(): Promise<AdminCredentials | null> {
 async function writeBlobCredentials(creds: AdminCredentials) {
   if (!hasBlobToken()) return false
   try {
-    const { put } = await import("@vercel/blob")
-    await put(BLOB_KEY, JSON.stringify(creds, null, 2), {
+    await putBlob(BLOB_KEY, JSON.stringify(creds, null, 2), {
       access: "private",
-      addRandomSuffix: false,
-      allowOverwrite: true,
       contentType: "application/json",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      cacheControlMaxAge: 60,
     })
     return true
   } catch (e) {

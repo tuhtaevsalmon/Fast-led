@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises"
 import path from "path"
 import { PRODUCTS } from "@/lib/products"
 import { PROJECTS } from "@/lib/portfolio"
+import { hasBlobToken, putBlob, readBlobText, useRemoteBlob } from "@/lib/content/blob"
 import type { HomeHero, Product, Project, SiteContent, SiteSettings } from "@/lib/types"
 
 const LOCAL_FILE = path.join(process.cwd(), "data", "site.json")
@@ -76,51 +77,28 @@ function normalize(raw: Partial<SiteContent> | null): SiteContent {
   }
 }
 
-function useRemoteBlob() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN && process.env.VERCEL)
-}
-
-async function parseBlobJson(text: string) {
-  return normalize(JSON.parse(text))
-}
-
 async function readBlob(): Promise<SiteContent | null> {
   if (!useRemoteBlob()) return null
   try {
-    const { get } = await import("@vercel/blob")
-    const result = await get(BLOB_KEY, { access: "public", useCache: true })
-    if (result?.statusCode === 200 && result.stream) {
-      return parseBlobJson(await new Response(result.stream).text())
-    }
-  } catch {
-    /* try list fallback */
-  }
-  try {
-    const { list } = await import("@vercel/blob")
-    const { blobs } = await list({ prefix: BLOB_KEY, limit: 5 })
-    const file = blobs.find((b) => b.pathname === BLOB_KEY) ?? blobs[0]
-    if (!file) return null
-    const res = await fetch(file.url, { next: { revalidate: 30 } })
-    if (!res.ok) return null
-    return parseBlobJson(await res.text())
+    const text = await readBlobText(BLOB_KEY)
+    if (!text) return null
+    return normalize(JSON.parse(text))
   } catch {
     return null
   }
 }
 
 async function writeBlob(content: SiteContent) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return false
+  if (!hasBlobToken()) return false
   try {
-    const { put } = await import("@vercel/blob")
-    await put(BLOB_KEY, JSON.stringify(content, null, 2), {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
+    await putBlob(BLOB_KEY, JSON.stringify(content, null, 2), {
+      access: "private",
       contentType: "application/json",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      cacheControlMaxAge: 60,
     })
     return true
-  } catch {
+  } catch (e) {
+    console.error("site.json blob write failed", e)
     return false
   }
 }
@@ -161,7 +139,9 @@ export async function writeSite(content: SiteContent) {
   if (useRemoteBlob()) {
     const blobOk = await writeBlob(next)
     if (!blobOk) {
-      throw new Error("Не удалось сохранить. На Vercel проверьте BLOB_READ_WRITE_TOKEN.")
+      throw new Error(
+        "Не удалось сохранить в Blob. Проверьте токен без кавычек, что хранилище привязано к проекту, и сделайте Redeploy."
+      )
     }
     return next
   }
@@ -206,12 +186,9 @@ export async function saveUploadedFile(file: File, folder: string) {
   const bytes = Buffer.from(await file.arrayBuffer())
 
   if (useRemoteBlob() || process.env.CMS_USE_BLOB === "1") {
-    const { put } = await import("@vercel/blob")
-    const uploaded = await put(`cms/uploads/${name}`, bytes, {
+    const uploaded = await putBlob(`cms/uploads/${name}`, bytes, {
       access: "public",
-      addRandomSuffix: false,
       contentType: file.type || "image/png",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
     })
     return uploaded.url
   }
