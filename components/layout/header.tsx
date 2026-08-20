@@ -163,7 +163,8 @@ export function Header({ settings }: { settings: SiteSettings }) {
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(20rem,90vw)]">
               <SheetHeader>
-                <SheetTitle>Fast LED</SheetTitle>
+                <SheetTitle className="sr-only">Fast LED</SheetTitle>
+                <Logo />
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 {NAV.map((item) => {
