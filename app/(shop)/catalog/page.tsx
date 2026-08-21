@@ -1,7 +1,15 @@
+import type { Metadata } from "next"
 import { CatalogView } from "@/components/catalog/catalog-view"
 import { getPublicProducts } from "@/lib/content/store"
 
 export const dynamic = "force-dynamic"
+
+export const metadata: Metadata = {
+  title: "Каталог LED-экранов — Fast LED",
+  description:
+    "Каталог светодиодных экранов Absen, Unilumin, Leyard. Indoor, outdoor, прозрачные и гибкие модели. Цены в TJS, поставка и монтаж в Душанбе.",
+  alternates: { canonical: "/catalog" },
+}
 
 export default async function CatalogPage() {
   const products = await getPublicProducts()

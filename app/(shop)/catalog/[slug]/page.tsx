@@ -6,6 +6,7 @@ import { formatPitch } from "@/lib/format"
 import { ProductActions } from "@/components/catalog/product-actions"
 import { LedPreview } from "@/components/led-preview"
 import { getPublicProducts } from "@/lib/content/store"
+import { SITE_URL } from "@/lib/site"
 
 export const dynamic = "force-dynamic"
 
@@ -17,9 +18,18 @@ export async function generateMetadata({
   const { slug } = await params
   const product = (await getPublicProducts()).find((p) => p.slug === slug)
   if (!product) return { title: "Каталог" }
+  const title = `${product.name} — Fast LED`
+  const image = product.image.startsWith("http") ? product.image : `${SITE_URL}${product.image}`
   return {
-    title: `${product.name} — Fast LED`,
+    title,
     description: product.description,
+    alternates: { canonical: `/catalog/${product.slug}` },
+    openGraph: {
+      title,
+      description: product.description,
+      url: `${SITE_URL}/catalog/${product.slug}`,
+      images: [{ url: image }],
+    },
   }
 }
 
@@ -47,8 +57,32 @@ export default async function ProductPage({
     },
   ]
 
+  const image = product.image.startsWith("http") ? product.image : `${SITE_URL}${product.image}`
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image,
+    description: product.description,
+    sku: product.id,
+    category: CATEGORY_LABEL[product.category],
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "TJS",
+      price: product.pricePerM2Tjs,
+      availability: product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      url: `${SITE_URL}/catalog/${product.slug}`,
+    },
+  }
+
   return (
     <div className="page-shell grid gap-8 py-8 sm:gap-12 sm:py-12 lg:grid-cols-2 lg:gap-16 lg:py-16 xl:gap-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <LedPreview
         src={product.image}
         alt={product.name}

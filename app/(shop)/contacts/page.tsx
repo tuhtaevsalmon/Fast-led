@@ -1,8 +1,16 @@
+import type { Metadata } from "next"
 import { MapPin, Phone } from "lucide-react"
 import { mapEmbedUrl } from "@/lib/content/urls"
 import { getSettings } from "@/lib/content/store"
 
 export const dynamic = "force-dynamic"
+
+export const metadata: Metadata = {
+  title: "Контакты — Fast LED",
+  description:
+    "Шоурум Fast LED в Душанбе. Адрес, телефон и WhatsApp для заявки на LED-экран, монтаж и обслуживание.",
+  alternates: { canonical: "/contacts" },
+}
 
 export default async function ContactsPage() {
   const settings = await getSettings()
